@@ -24,6 +24,9 @@ export OLLAMA_RUNNERS_DIR="$OLLAMA_RUNTIME/runners"
 export OLLAMA_TMPDIR="$OLLAMA_RUNTIME/tmp"
 export OLLAMA_ORIGINS="*"
 export OLLAMA_HOST="127.0.0.1:11434"
+# Point Ollama to shared libraries (llama-quantize, llama-server, .so files)
+export OLLAMA_LIBRARY_PATH="$SHARED_DIR/lib/ollama"
+export LD_LIBRARY_PATH="$SHARED_DIR/lib/ollama${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 mkdir -p "$OLLAMA_RUNTIME/runners" "$OLLAMA_RUNTIME/tmp"
 # -------------------------------------------------------
 
