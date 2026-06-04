@@ -484,27 +484,27 @@ else
         chmod +x "$OLLAMA_BIN"
         echo -e "${GRN}      Ollama Linux Engine ready!${RST}"
     fi
+fi
 
-    # Also extract shared libraries (llama-quantize, llama-server, .so files)
-    # needed by Ollama 0.30+ for model import and inference
-    OLLAMA_LIB_DIR="$SHARED_DIR/lib/ollama"
-    if [ ! -f "$OLLAMA_LIB_DIR/llama-quantize" ] || [ ! -f "$OLLAMA_LIB_DIR/llama-server" ]; then
-        echo -e "${YLW}      Downloading Ollama shared libraries...${RST}"
-        mkdir -p "$OLLAMA_LIB_DIR"
-        # Download the full archive to a temp file, extract lib/ollama/, then remove the archive
-        OLLAMA_TGZ=$(mktemp)
-        curl -L --fail --progress-bar "$ARCHIVE_URL" -o "$OLLAMA_TGZ" 2>&1
-        if tar --use-compress-program=zstd -xf "$OLLAMA_TGZ" -C "$SHARED_DIR" lib/ollama/ 2>/dev/null; then
-            chmod +x "$OLLAMA_LIB_DIR/llama-quantize" "$OLLAMA_LIB_DIR/llama-server" 2>/dev/null
-            echo -e "${GRN}      Ollama shared libraries ready!${RST}"
-        else
-            echo -e "${RED}      ERROR: Failed to extract shared libraries!${RST}"
-            DOWNLOAD_ERRORS+=("Ollama shared libraries")
-        fi
-        rm -f "$OLLAMA_TGZ"
+
+# Also extract shared libraries (llama-quantize, llama-server, .so files)
+# needed by Ollama 0.30+ for model import and inference
+OLLAMA_LIB_DIR="$SHARED_DIR/lib/ollama"
+if [ ! -f "$OLLAMA_LIB_DIR/llama-quantize" ] || [ ! -f "$OLLAMA_LIB_DIR/llama-server" ]; then
+    echo -e "${YLW}      Downloading Ollama shared libraries...${RST}"
+    mkdir -p "$OLLAMA_LIB_DIR"
+    OLLAMA_TGZ=$(mktemp)
+    curl -L --fail --progress-bar "$ARCHIVE_URL" -o "$OLLAMA_TGZ" 2>&1
+    if tar --use-compress-program=zstd -xf "$OLLAMA_TGZ" -C "$SHARED_DIR" lib/ollama/ 2>/dev/null; then
+        chmod +x "$OLLAMA_LIB_DIR/llama-quantize" "$OLLAMA_LIB_DIR/llama-server" 2>/dev/null
+        echo -e "${GRN}      Ollama shared libraries ready!${RST}"
     else
-        echo -e "${GRN}      Ollama shared libraries already present, skipping.${RST}"
+        echo -e "${RED}      ERROR: Failed to extract shared libraries!${RST}"
+        DOWNLOAD_ERRORS+=("Ollama shared libraries")
     fi
+    rm -f "$OLLAMA_TGZ"
+else
+    echo -e "${GRN}      Ollama shared libraries already present, skipping.${RST}"
 fi
 
 # ================================================================
